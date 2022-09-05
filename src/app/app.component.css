@@ -11,6 +11,17 @@ h1 {
 table {
     width: 100%;
 }
+table th{
+    background-color: #444;
+    height: 1em;
+    color: #ccc;
+}
+table td {
+	background: #ccc;
+}
+table tr:nth-child(odd) td {
+	background: #fff;
+}
 
 .mat-column-no {
     width: 10%;
