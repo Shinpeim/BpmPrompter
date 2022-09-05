@@ -1,0 +1,32 @@
+
+h1 {
+  width: 100%;
+  background-color: black;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  padding: 2px;
+  color: #aaaaaa;
+}
+
+table {
+    width: 100%;
+}
+
+.mat-column-no {
+    width: 10%;
+}
+
+.mat-column-bpm {
+    width: 10%;
+}
+
+.mat-column-title {
+    width: 70%;
+}
+
+.bpm-input {
+    width: 90%;
+}
+.title-input {
+    width: 90%;
+}

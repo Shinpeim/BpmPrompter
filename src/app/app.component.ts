@@ -1,10 +1,127 @@
-import { Component } from '@angular/core';
+import { NgIfContext } from '@angular/common';
+import { Component, ViewChildren, OnInit } from '@angular/core';
+import {MatTable} from '@angular/material/table';
+import { Clipboard } from '@angular/cdk/clipboard';
+
+interface Song {
+  no: number,
+  title: string,
+  bpm: number,
+  signalVisible: boolean,
+  signalIntervalId: number | false
+}
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'BpmPrompter';
+  songs: Array<Song> = []
+  private intervalIds: number[] = [];
+
+  @ViewChildren(MatTable) tables: MatTable<Song>[] = [];
+
+  constructor(private clipboard: Clipboard) {}
+
+  ngOnInit(){
+    this.loadSongsFromHash();
+  }
+
+  removeSong(no: number){
+    let newNo = 1;
+
+    const oldSongs = this.songs;
+    const newSongs = [];
+
+    this.songs = [];
+    this.intervalIds.forEach((id) => {window.clearInterval(id)})
+
+    for (const s of oldSongs) {
+      this.removeSignalTimer(s)
+      if (s.no == no) {
+        continue;
+      }
+      const newSong = s;
+      s.no = newNo;
+      this.addSong(newSong)
+      newNo += 1;
+    }
+    this.tables.forEach((t) => t.renderRows());
+  }
+
+  addNewSong() {
+    const no = this.songs.length + 1;
+    const song: Song = {
+      no: no,
+      title: 'song title',
+      bpm : 120,
+      signalVisible: false,
+      signalIntervalId: false
+    }
+    this.addSong(song)
+  }
+
+  addSong(song: Song) {
+    this.songs.push(song)
+    this.setSignalTimer(song)
+    this.tables.forEach((t) => t.renderRows());
+    this.makeHashFromSongs();
+  }
+
+  onBpmChanged(song: Song) {
+    this.removeSignalTimer(song) 
+    this.setSignalTimer(song) 
+    this.makeHashFromSongs();
+  }
+  onTitleChanged(_: Song) {
+    this.makeHashFromSongs();
+  }
+
+  copyShareLink(){
+    const url = window.location.href;
+    this.clipboard.copy(url);
+    alert('share link was copied to your clipboard')
+  }
+
+  private setSignalTimer(song: Song){
+    this.removeSignalTimer(song) 
+
+    const beatMillSec = (60.0 / song.bpm) * 1000;
+    song.signalIntervalId = window.setInterval(()=>{
+      this. flashSignal(song)
+    }, beatMillSec)
+  }
+
+  private removeSignalTimer(song: Song){
+    if (song.signalIntervalId !== false) {
+      window.clearInterval(song.signalIntervalId)
+    }
+  }
+
+  private flashSignal(song: Song){
+    song.signalVisible = true;
+    setTimeout(() => {
+      song.signalVisible = false;
+    }, 100)
+  }
+
+  private makeHashFromSongs() {
+    const json = JSON.stringify(this.songs)
+    window.location.hash = json;
+  }
+  
+  private loadSongsFromHash(){
+    try {
+      const hash = decodeURI(window.location.hash.slice(1));
+      const songs: Song[] = JSON.parse(hash)
+      songs.forEach((s: Song) => {
+        this.addSong(s)
+      });
+    } catch(e) {
+      console.error(e);
+      this.addNewSong();
+    }
+  }
 }
