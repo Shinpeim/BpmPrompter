@@ -52,9 +52,8 @@ export class AppComponent implements OnInit {
   }
 
   addNewSong() {
-    const no = this.songs.length + 1;
     const song: Song = {
-      no: no,
+      no: 0,
       title: 'song title',
       bpm : 120,
       signalVisible: false,
@@ -64,6 +63,7 @@ export class AppComponent implements OnInit {
   }
 
   addSong(song: Song) {
+    song.no = this.songs.length + 1;
     this.songs.push(song)
     this.setSignalTimer(song)
     this.tables.forEach((t) => t.renderRows());
@@ -108,15 +108,38 @@ export class AppComponent implements OnInit {
   }
 
   private makeHashFromSongs() {
-    const json = JSON.stringify(this.songs)
+    const songs = this.songs.map(s => {
+      return {
+        title: s.title,
+        bpm: s.bpm
+      }
+    })
+    const json = JSON.stringify(songs)
     window.location.hash = json;
   }
   
   private loadSongsFromHash(){
     try {
       const hash = decodeURI(window.location.hash.slice(1));
-      const songs: Song[] = JSON.parse(hash)
-      songs.forEach((s: Song) => {
+      const songs = JSON.parse(hash)
+      songs.forEach((s: any) => {
+        const no = this.songs.length + 1;
+        const title = s.title || "new song";
+        const maybeBpm = parseInt(s.bpm)
+        let bpm;
+        if (isNaN(maybeBpm)) {
+          bpm = 120;
+        } else {
+          bpm = maybeBpm;
+        }
+
+        const newSong: Song = {
+          no,
+          title,
+          bpm,
+          signalVisible: false,
+          signalIntervalId: false
+        }
         this.addSong(s)
       });
     } catch(e) {
