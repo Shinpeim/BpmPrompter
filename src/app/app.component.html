@@ -20,7 +20,6 @@
         <td mat-cell *matCellDef="let element"> {{element.title}} </td>
       </ng-container>
    
-      <tr mat-header-row *matHeaderRowDef="['no', 'signal', 'title']"></tr>
       <tr mat-row *matRowDef="let row; columns: ['no', 'signal', 'title'];"></tr>
     </table>
     <button (click)="copyShareLink()">copy share link</button>
