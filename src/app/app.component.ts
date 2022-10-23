@@ -19,7 +19,6 @@ interface Song {
 export class AppComponent implements OnInit {
   title = 'BpmPrompter';
   songs: Array<Song> = []
-  private intervalIds: number[] = [];
 
   @ViewChildren(MatTable) tables: MatTable<Song>[] = [];
 
@@ -33,10 +32,8 @@ export class AppComponent implements OnInit {
     let newNo = 1;
 
     const oldSongs = this.songs;
-    const newSongs = [];
 
     this.songs = [];
-    this.intervalIds.forEach((id) => {window.clearInterval(id)})
 
     for (const s of oldSongs) {
       this.removeSignalTimer(s)
@@ -50,6 +47,41 @@ export class AppComponent implements OnInit {
     }
     this.tables.forEach((t) => t.renderRows());
   }
+
+  moveSongUp(no: number){
+    if (no == 1) {
+      return;
+    }
+    const index = no - 1;
+
+    const tmp = this.songs[index - 1];
+    this.songs[index - 1] = this.songs[index];
+    this.songs[index] = tmp;
+
+    this.songs[index- 1].no = index
+    this.songs[index].no = index + 1
+    this.makeHashFromSongs();
+    this.tables.forEach((t) => t.renderRows());
+  }
+
+  moveSongDown(no: number){
+    if (no == this.songs.length) {
+      return;
+    }
+
+    const index = no - 1;
+
+    const tmp = this.songs[index];
+    this.songs[index] = this.songs[index + 1];
+    this.songs[index + 1] = tmp;
+
+    this.songs[index].no = index + 1
+    this.songs[index + 1].no = index + 2
+    this.makeHashFromSongs();
+    this.tables.forEach((t) => t.renderRows());
+
+  }
+
 
   addNewSong() {
     const song: Song = {
@@ -147,4 +179,5 @@ export class AppComponent implements OnInit {
       this.addNewSong();
     }
   }
+
 }

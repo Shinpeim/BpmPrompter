@@ -42,13 +42,16 @@
         <td mat-cell *matCellDef="let element"> <input (change)="onTitleChanged(element)" type="text" [(ngModel)]="element.title" class="title-input"> </td>
       </ng-container>
 
-      <ng-container matColumnDef="remove">
+      <ng-container matColumnDef="control">
         <th mat-header-cell *matHeaderCellDef> remove </th>
-        <td mat-cell *matCellDef="let element"> <button (click)="removeSong(element.no)">-</button> </td>
+        <td mat-cell *matCellDef="let element">
+          <button (click)="moveSongUp(element.no)">↑</button>
+          <button (click)="moveSongDown(element.no)">↓</button>
+          <button (click)="removeSong(element.no)">-</button> </td>
       </ng-container>
  
-      <tr mat-header-row *matHeaderRowDef="['no', 'bpm', 'title', 'remove']"></tr>
-      <tr mat-row *matRowDef="let row; columns: ['no', 'bpm', 'title', 'remove'];"></tr>
+      <tr mat-header-row *matHeaderRowDef="['no', 'bpm', 'title', 'control']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['no', 'bpm', 'title', 'control'];"></tr>
     </table>
     <button (click)="addNewSong()">add a song</button>
   </mat-tab>
